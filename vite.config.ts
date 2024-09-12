@@ -29,6 +29,7 @@ export default defineConfig({
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 15_000_000,
       },
 
       devOptions: {
