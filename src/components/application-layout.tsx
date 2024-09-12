@@ -65,6 +65,7 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
 
     setName("");
     setAvatar("");
+    setOpen(false);
   };
 
   const editList = async (id: number) => {
