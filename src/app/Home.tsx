@@ -13,7 +13,9 @@ import {
   DialogTitle,
 } from "@/components/dialog";
 import {
+  CheckIcon,
   EllipsisHorizontalIcon,
+  ListBulletIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   PlusIcon,
@@ -333,7 +335,7 @@ export function Home() {
                   if (a.status === "done" && b.status === "todo") return 1;
 
                   // If statuses are the same, sort by id (ascending order)
-                  return a.id - b.id;
+                  return b.id - a.id;
                 })
                 .map((todo) => (
                   <motion.li
@@ -376,12 +378,12 @@ export function Home() {
                       <DropdownMenu>
                         {todo.status === "done" ? (
                           <DropdownItem onClick={() => setStatusTodo(todo.id)}>
-                            <PencilIcon className="w-5 h-5" />
+                            <ListBulletIcon className="w-5 h-5" />
                             <span>Mark Todo</span>
                           </DropdownItem>
                         ) : (
                           <DropdownItem onClick={() => setStatusDone(todo.id)}>
-                            <PencilIcon className="w-5 h-5" />
+                            <CheckIcon className="w-5 h-5" />
                             <span>Mark Done</span>
                           </DropdownItem>
                         )}
@@ -433,6 +435,7 @@ export function Home() {
             <Field>
               <Label htmlFor="list">List</Label>
               <Select id="list" className="w-full mb-8">
+                <option value="">Select a list</option>
                 {lists?.rows.map((list: any) => (
                   <option key={list.id} value={list.id}>
                     {list.name}
@@ -497,6 +500,24 @@ export function Home() {
                 className="mb-8"
               />
             </Field>
+
+            {lists && lists.rows.length > 0 ? (
+              <Field>
+                <Label htmlFor="list">List</Label>
+                <Select
+                  id="list"
+                  className="w-full mb-8"
+                  defaultValue={listId ? listId.toString() : undefined}
+                >
+                  <option value="">Select a list</option>
+                  {lists?.rows.map((list: any) => (
+                    <option key={list.id} value={list.id}>
+                      {list.name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
 
             <DialogActions>
               <Button onClick={() => setEditId(null)}>Cancel</Button>
