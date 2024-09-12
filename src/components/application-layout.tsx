@@ -187,7 +187,15 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
             </Field>
 
             <DialogActions>
-              <Button onClick={() => setOpen(false)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  setName("");
+                  setAvatar("");
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
               <Button color="emerald" onClick={createList}>
                 Create
               </Button>
@@ -224,7 +232,15 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
             </Field>
 
             <DialogActions>
-              <Button onClick={() => setEditId(0)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  setName("");
+                  setAvatar("");
+                  setEditId(0);
+                }}
+              >
+                Cancel
+              </Button>
               <Button color="emerald" onClick={() => editList(editId)}>
                 Save
               </Button>
@@ -233,7 +249,14 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
         </DialogBody>
       </Dialog>
 
-      <Dialog open={deleteId > 0} onClose={() => setDeleteId(0)}>
+      <Dialog
+        open={deleteId > 0}
+        onClose={() => {
+          setName("");
+          setAvatar("");
+          setDeleteId(0);
+        }}
+      >
         <DialogTitle>Delete List</DialogTitle>
         <DialogBody>
           <p>Are you sure you want to delete this list?</p>

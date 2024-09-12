@@ -445,7 +445,15 @@ export function Home() {
             </Field>
 
             <DialogActions>
-              <Button onClick={() => setOpen(false)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  setTodo("");
+                  setListId(null);
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
               <Button type="submit" color="emerald">
                 Add Todo
               </Button>
@@ -462,7 +470,15 @@ export function Home() {
           </Text>
         </DialogBody>
         <DialogActions>
-          <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setTodo("");
+              setListId(null);
+              setDeleteId(null);
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={() => {
               if (!deleteId) return;
@@ -520,7 +536,15 @@ export function Home() {
             ) : null}
 
             <DialogActions>
-              <Button onClick={() => setEditId(null)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  setTodo("");
+                  setListId(null);
+                  setEditId(null);
+                }}
+              >
+                Cancel
+              </Button>
               <Button type="submit" color="emerald">
                 Update Todo
               </Button>
