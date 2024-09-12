@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery, usePGlite } from "@electric-sql/pglite-react";
 import { Field, Label } from "@/components/fieldset";
 import { Input } from "@/components/input";
@@ -88,7 +88,7 @@ export function Home() {
   const [action, setAction] = useState<"filter" | "search" | undefined>();
 
   const debouncedSearch = useDebounce(search, 300);
-  const paramListId = Number(params.get("listId"));
+  const paramListId = useMemo(() => Number(params.get("listId")), [params]);
 
   const insertTodo = async () => {
     if (!todo) return;
@@ -160,7 +160,6 @@ export function Home() {
 
   useEffect(() => {
     if (!allTodos) return;
-    console.log("RUNNING");
 
     // if (!paramListId && todos) return;
 
@@ -177,6 +176,8 @@ export function Home() {
     if (!paramListId) {
       setTodos(allTodos?.rows ?? undefined);
     }
+
+    setSearch("");
   }, [paramListId, allTodos?.rows]);
 
   useEffect(() => {
