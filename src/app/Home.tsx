@@ -52,8 +52,8 @@ const listVariant = {
 };
 
 const itemVariant = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
+  hidden: { opacity: 0, z: 0 },
+  visible: { opacity: 1, z: 10 },
 };
 
 function useDebounce(value: any, delay: number) {
@@ -257,7 +257,7 @@ export function Home() {
           <Button
             onClick={() => setOpen(!open)}
             color="emerald"
-            className="!fixed bottom-4 right-4 z-20"
+            className="!fixed bottom-8 right-8 md:bottom-4 md:right-4 z-20"
           >
             <PlusIcon className="w-6 h-6" />
           </Button>
@@ -339,7 +339,7 @@ export function Home() {
                   <motion.li
                     key={todo.id}
                     variants={itemVariant}
-                    className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 pl-4 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950"
+                    className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 pl-4 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 z-0"
                     layout
                   >
                     <div className="flex items-start gap-4">
