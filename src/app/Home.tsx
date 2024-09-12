@@ -311,7 +311,7 @@ export function Home() {
                 type="search"
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search todos"
-                className="w-full max-w-[800px]"
+                className="w-full"
               />
             </motion.div>
           )}
