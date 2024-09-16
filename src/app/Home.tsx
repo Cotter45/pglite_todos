@@ -35,6 +35,7 @@ import {
 } from "@/components/dropdown";
 import { Checkbox } from "@/components/checkbox";
 import clsx from "clsx";
+import { Badge } from "@/components/badge";
 
 export type Todo = {
   id: number;
@@ -139,6 +140,7 @@ export function Home() {
 
     setTodo("");
     setListId(null);
+    setOpen(false);
   };
 
   async function searchTodos(query: string) {
@@ -178,31 +180,53 @@ export function Home() {
   }
 
   const updateTodo = async (id: number, text: string) => {
-    db.query("UPDATE todos SET text = $1 WHERE id = $2", [text, id]);
+    if (listId) {
+      db.query("UPDATE todos SET text = $1, list_id = $2 WHERE id = $3", [
+        text,
+        listId,
+        id,
+      ]);
+    } else {
+      db.query("UPDATE todos SET text = $1 WHERE id = $2", [text, id]);
+    }
+
+    setTodo("");
+    setListId(null);
+    setEditId(null);
   };
 
   const setStatusDone = async (id: number) => {
     db.query("UPDATE todos SET status = 'done' WHERE id = $1", [id]);
+
+    setTodo("");
+    setListId(null);
+    setEditId(null);
   };
 
   const setStatusTodo = async (id: number) => {
     db.query("UPDATE todos SET status = 'todo' WHERE id = $1", [id]);
+
+    setTodo("");
+    setListId(null);
+    setEditId(null);
   };
 
   const deleteTodo = async (id: number) => {
     db.query("DELETE FROM todos WHERE id = $1", [id]);
+
+    setTodo("");
+    setListId(null);
+    setDeleteId(null);
   };
 
   useEffect(() => {
     if (!allTodos) return;
 
-    // if (!paramListId && todos) return;
-
     if (paramListId) {
       setListId(paramListId);
 
       const filteredTodos = allTodos?.rows.filter(
-        (todo) => todo.list_id === paramListId
+        (todo) => Number(todo.list_id) === paramListId
       );
 
       setTodos(filteredTodos);
@@ -341,33 +365,42 @@ export function Home() {
                   <motion.li
                     key={todo.id}
                     variants={itemVariant}
-                    className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 pl-4 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 z-0"
+                    className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 pl-4 flex items-start justify-between bg-zinc-50 dark:bg-zinc-950 z-0"
                     layout
                   >
-                    <div className="flex items-start gap-4">
-                      <Checkbox
-                        checked={todo.status === "done"}
-                        color={todo.status === "done" ? "emerald" : "zinc"}
-                        onChange={() => {
-                          if (todo.status === "todo") {
-                            setStatusDone(todo.id);
-                          } else {
-                            setStatusTodo(todo.id);
-                          }
-                        }}
-                        className="mt-[0.35rem]"
-                      />
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-start gap-4 max-w-[95%]">
+                        <Checkbox
+                          checked={todo.status === "done"}
+                          color={todo.status === "done" ? "emerald" : "zinc"}
+                          onChange={() => {
+                            if (todo.status === "todo") {
+                              setStatusDone(todo.id);
+                            } else {
+                              setStatusTodo(todo.id);
+                            }
+                          }}
+                          className="mt-[0.35rem]"
+                        />
 
-                      <Subheading
-                        level={3}
-                        className={clsx(
-                          "flex items-center gap-2",
-                          todo.status === "done" &&
-                            "line-through text-zinc-300 dark:text-zinc-700"
-                        )}
-                      >
-                        <span>{todo.text}</span>
-                      </Subheading>
+                        <Subheading
+                          level={3}
+                          className={clsx(
+                            "mt-1 flex gap-2 !text-sm !font-normal",
+                            todo.status === "done" &&
+                              "line-through text-zinc-300 dark:text-zinc-700"
+                          )}
+                        >
+                          <span>{todo.text}</span>
+                        </Subheading>
+                      </div>
+
+                      {todo.list_id ? (
+                        <Badge color="emerald" className="ml-7">
+                          {lists?.rows.find((list) => list.id === todo.list_id)
+                            ?.name ?? "Unknown"}
+                        </Badge>
+                      ) : null}
                     </div>
 
                     <Dropdown>
@@ -390,8 +423,9 @@ export function Home() {
 
                         <DropdownItem
                           onClick={() => {
-                            setEditId(todo.id);
+                            setListId(todo.list_id);
                             setTodo(todo.text);
+                            setEditId(todo.id);
                           }}
                         >
                           <PencilIcon className="w-5 h-5" />
@@ -411,7 +445,14 @@ export function Home() {
         </AnimatePresence>
       </div>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      <Dialog
+        open={open}
+        onClose={() => {
+          setTodo("");
+          setListId(null);
+          setOpen(false);
+        }}
+      >
         <DialogTitle>New Todo</DialogTitle>
         <DialogBody>
           <form
@@ -434,7 +475,12 @@ export function Home() {
 
             <Field>
               <Label htmlFor="list">List</Label>
-              <Select id="list" className="w-full mb-8">
+              <Select
+                id="list"
+                className="w-full mb-8"
+                value={listId ?? ""}
+                onChange={(e) => setListId(Number(e.target.value))}
+              >
                 <option value="">Select a list</option>
                 {lists?.rows.map((list: any) => (
                   <option key={list.id} value={list.id}>
@@ -493,7 +539,14 @@ export function Home() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={!!editId} onClose={() => setEditId(null)}>
+      <Dialog
+        open={!!editId}
+        onClose={() => {
+          setTodo("");
+          setListId(null);
+          setEditId(null);
+        }}
+      >
         <DialogTitle>Edit Todo</DialogTitle>
         <DialogBody>
           <form
@@ -523,7 +576,8 @@ export function Home() {
                 <Select
                   id="list"
                   className="w-full mb-8"
-                  defaultValue={listId ? listId.toString() : undefined}
+                  value={listId ?? ""}
+                  onChange={(e) => setListId(Number(e.target.value))}
                 >
                   <option value="">Select a list</option>
                   {lists?.rows.map((list: any) => (
